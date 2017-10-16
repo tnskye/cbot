@@ -2,13 +2,29 @@
 
 import config
 import telebot
+import os
+from flask import Flask, request
+
 from curling import Curlinger
 from whitelist import WhiteLister
 
 bot = telebot.TeleBot(config.ttoken)
 whitelist = WhiteLister()
 
-#cur = Curlinger(config.ctoken)
+server = Flask(__name__)
+
+@server.route("/" + config.ttoken, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+@server.route("/")
+def webhook():
+    url = "https://rocky-mesa-11265.herokuapp.com/" + config.ttoken
+    bot.remove_webhook()
+    bot.set_webhook(url)
+    return "!", 200
+
 
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
@@ -123,5 +139,7 @@ def handle_text(message):
 
     bot.send_message(message.chat.id, text, parse_mode='html')
 
-if __name__ == '__main__':
-    bot.polling(none_stop=True)
+#if __name__ == '__main__':
+#    bot.polling(none_stop=True)
+
+server.run(host="0.0.0.0", port=os.environ.get('PORT', 5000))

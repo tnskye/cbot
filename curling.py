@@ -66,12 +66,14 @@ class Curlinger:
                                 count[j] += item
 
                     if item_type in ['ada', 'jarvis', 'forceamp', 'turret', 'fracker']:
-                        result = result + "    " + str(values['results'][i]['name']) + ": " + str(values['results'][i]['items'][item_type]) + "\n"
+                        if values['results'][i]['items'][item_type] != 0:
+                            result = result + "    " + str(values['results'][i]['name']) + ": " + str(values['results'][i]['items'][item_type]) + "\n"
                     else:
-                        result = result + "    " + str(values['results'][i]['name']) + ": " + ', '.join(map(str, values['results'][i]['items'][item_type])) + "\n"
+                        if any(item != 0 for item in values['results'][i]['items'][item_type]):
+                            result = result + "    " + str(values['results'][i]['name']) + ": " + ', '.join(map(str, values['results'][i]['items'][item_type])) + "\n"
                     i += 1
 
-                print (count)
+                #print (count)
                 if item_type in ['ada', 'jarvis', 'forceamp', 'turret', 'fracker']:
                     result += u'    <b>Итого: ' + str(count) + "</b>\n"
                 else:
@@ -79,10 +81,10 @@ class Curlinger:
 
                 return result
             else:
-                print (r)
+                #print (r)
                 return self.error_text
         except requests.exceptions.RequestException as e:
-            print (e)
+            #print (e)
             return self.error_text
 
     def search_my_keys(self, keyname):
@@ -218,7 +220,3 @@ class Curlinger:
         except requests.exceptions.RequestException as e:
             return self.error_text
         
-
-#cur = Curlinger(ctoken)
-#print (cur.check_item_type('123'))
-#print (cur.check_item_type('ada'))
